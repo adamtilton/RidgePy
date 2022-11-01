@@ -1,0 +1,9 @@
+README.md
+setup.py
+RidgePy.egg-info/PKG-INFO
+RidgePy.egg-info/SOURCES.txt
+RidgePy.egg-info/dependency_links.txt
+RidgePy.egg-info/requires.txt
+RidgePy.egg-info/top_level.txt
+bin/simulation/0.0-simulate-single-mode.py
+bin/simulation/0.1-simulate-multi-mode.py

@@ -16,8 +16,7 @@ setup(
     ],
     include_package_date          = True,
     scripts                       = [
-        "bin/audio_example.py",
-        "bin/simulate/0.0-simulate-single-mode.py",
-        "bin/simulate/0.1-simulate-multi-mode.py",
+        "bin/simulation/0.0-simulate-single-mode.py",
+        "bin/simulation/0.1-simulate-multi-mode.py",
     ],
 )
