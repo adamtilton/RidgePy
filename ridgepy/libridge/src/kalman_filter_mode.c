@@ -48,6 +48,11 @@ void kalman_filter_mode_prior_update(
         kf_mode_state->coefficients[1] * kf_mode_state->sin_phase
     );
 
+    kf_mode_state->power = sqrt(
+        kf_mode_state->coefficients[0] * kf_mode_state->coefficients[0] +
+        kf_mode_state->coefficients[1] * kf_mode_state->coefficients[1]
+    );
+
     node_convergence(kf_mode_state);
 }
 
@@ -72,8 +77,8 @@ void kalman_filter_mode_posterior_update(
     }
 
     inverse  = kf_mode_state->observation_noise_covariance;
-    inverse += H[0] * (S[0][0]*H[0] + S[0][1]*H[1]);
-    inverse += H[1] * (S[1][0]*H[0] + S[1][1]*H[1]);
+    inverse += H[0] * (H[0]*S[0][0] + H[1]*S[1][0]);
+    inverse += H[1] * (H[0]*S[0][1] + H[1]*S[1][1]);
 
     kf_mode_state->gain[0] = (S[0][0]*H[0] + S[0][1]*H[1]) / inverse;
     kf_mode_state->gain[1] = (S[1][0]*H[0] + S[1][1]*H[1]) / inverse;

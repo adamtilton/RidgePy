@@ -14,6 +14,7 @@ class KalmanFilterMode(Structure):
         ("mode_number", c_int),
         ("learning_rate", c_float),
         ("coefficients", c_float * 2),
+        ("power", c_float),
         ("cos_phase", c_float),
         ("sin_phase", c_float),
         ("convergence", c_float),

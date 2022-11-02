@@ -33,6 +33,7 @@ typedef struct {
     int mode_number;
     float learning_rate;
     float coefficients[2];
+    float power;
     float cos_phase;
     float sin_phase;
     float convergence;

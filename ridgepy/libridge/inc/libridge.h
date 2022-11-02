@@ -30,12 +30,14 @@
 
 //TODO: Change MEASUREMENT_COUNT to CHANNEL_COUNT
 #define MEASUREMENT_COUNT           1               // Number of measurements, Change to CHANNEL_COUNT
-#define MODE_COUNT                  6               // Number of Basis Modes
+#define MODE_COUNT                  250               // Number of Basis Modes
 #define BASIS_COUNT                 2               // FOURIER
 #define STATE_COUNT                 1               // FOURIER
 
 #define QUADRATURE_STATES           12              // N-bit parallel word for quadrature
 #define CONVERGENCE_PERIODS         3               // Number of periods to check convergence on
 #define PREDICTIONS_COUNT           36
+
+#define MAXIMUM_CONTROL             0.05            // Maximum control amplitude
 
 #endif
