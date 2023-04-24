@@ -1,29 +1,13 @@
-# MooseDroolPy
+# RidgePy
 
-Kalman Filter for audio signals.
+Kalman Filter network that computes the spectrum of frequencies of a signal as it varies with time
 
-## Getting Started
+## Setup
 
-Navigate to the project folder.
+I suggest conda.
 
-`$ cd ridgepy`
+```
+conda env create -f environment.yml
+```
 
-Create a new virtual environment
-
-`$ python3 -m venv env`
-
-Activate the environment
-
-`$ source env/bin/activate`
-
-Upgrade Pip
-
-`$ python3 -m pip install --upgrade pip`
-
-Install requirements
-
-`pip install -r requirements.txt`
-
-Install the MooseDroolPy package
-
-`pip install -e .`
+Then check out the examples in `bin`.
