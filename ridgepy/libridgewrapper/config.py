@@ -27,8 +27,7 @@ assert LIBRARY_FILE.exists(), f"Could not find library file at {LIBRARY_FILE}"
 MAIN_CONFIG = extract_macros_from_header(CONFIG_FILE)
 LIBRARY     = cdll.LoadLibrary(LIBRARY_FILE)
 
-
-MAIN_CONFIG['CARRIER_FREQUENCY']        = 800.0   # frequency of carrier wave
-MAIN_CONFIG['AUDIO_SAMPLE_FREQUENCY']   = 44100.0 # frequency of sensor sample rate
-MAIN_CONFIG['MORSE_FREQUENCY']          = 40.0    # Frequency of dot symbol
-MAIN_CONFIG['AUDIO_VOLUME']             = 32767   # Audio signal Range
+if _name__ == "__main__":
+    print("MAIN_CONFIG:")
+    for key, value in MAIN_CONFIG.items():
+        print(f"{key}: {value}")

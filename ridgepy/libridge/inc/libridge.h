@@ -30,7 +30,7 @@
 
 //TODO: Change MEASUREMENT_COUNT to CHANNEL_COUNT
 #define MEASUREMENT_COUNT           1               // Number of measurements, Change to CHANNEL_COUNT
-#define MODE_COUNT                  250               // Number of Basis Modes
+#define MODE_COUNT                  1024              // Number of Basis Modes
 #define BASIS_COUNT                 2               // FOURIER
 #define STATE_COUNT                 1               // FOURIER
 
