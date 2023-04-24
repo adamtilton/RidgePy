@@ -1,0 +1,9 @@
+name: ridgepy
+channels:
+  - defaults
+dependencies:
+  - numpy
+  - matplotlib
+  - jupyter
+  - scipy
+  - pandas
