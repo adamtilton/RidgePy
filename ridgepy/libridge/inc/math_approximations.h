@@ -28,16 +28,10 @@
 
 //----------------------------------------------------------------------------
 // Math function definitions:
-// In IEEE 754, the float data type, also known as single precision, is a 32-bit
-// value that gives you a range of ±1.18×10−38 to ±3.4×1038 and about 7 digits
-// of precision. That means that you can only accurately represent pi as
-// 3.141592. That's fewer digits than you might expect.
 //----------------------------------------------------------------------------
 
-typedef float float32_t;
-#define TWO_PI                      6.283185f       // TWO PI for float32_t
-#define PI                          3.141592f       // PI for float32_t
-#define PI_2                        1.570796f       // PI over 2 for float32_t
+#define PI                          M_PI       // PI for float32_t
+#define PI_2                        M_PI_2       // PI over 2 for float32_t
 #define SQRT_THRESHOLD              0.000100f       //
 
 //----------------------------------------------------------------------------

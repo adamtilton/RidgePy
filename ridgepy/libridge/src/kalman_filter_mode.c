@@ -49,7 +49,7 @@ void kalman_filter_mode_prior_update(
     }
 
     // Calculate the prior prediction
-    kf_mode_state->phase += 2.0f * PI * kf_mode_state->frequency * frequency_sample;
+    kf_mode_state->phase += 2.0f * PI * kf_mode_state->frequency / frequency_sample;
     kf_mode_state->phase = fmod(kf_mode_state->phase, 2.0f * PI);
     kf_mode_state->cos_phase = COS( kf_mode_state->phase);
     kf_mode_state->sin_phase = SIN( kf_mode_state->phase);
