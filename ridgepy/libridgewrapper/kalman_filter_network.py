@@ -22,7 +22,7 @@ class KalmanFilterNetwork(Structure):
         modes: list
     ) -> None:
 
-        assert len(modes) == MODE_COUNT, "Supported number of modes is {MODE_COUNT}."
+        assert len(modes) == MODE_COUNT, f"Supported number of modes is {MODE_COUNT}."
 
         for mode_ndx, mode in enumerate(modes):
             self.modes[mode_ndx] = mode
