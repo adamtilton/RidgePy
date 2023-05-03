@@ -47,28 +47,28 @@ class KalmanFilterNetwork(object):
     """
     def __init__(self, modes):
         """Initialize the Kalman filter network."""
-        self.__modes = modes
-        self.__phase = 0.0
-        self.__error = 0.0
-        self.__prediction = 0.0
+        self._modes = modes
+        self._phase = 0.0
+        self._error = 0.0
+        self._prediction = 0.0
 
         logging.info(self)
 
     @property
     def modes(self):
-        return self.__modes
+        return self._modes
 
     @property
     def phase(self):
-        return self.__phase
+        return self._phase
 
     @property
     def error(self):
-        return self.__error
+        return self._error
 
     @property
     def prediction(self):
-        return self.__prediction
+        return self._prediction
 
     @property
     def sin_coefficients(self):
@@ -92,16 +92,16 @@ class KalmanFilterNetwork(object):
 
     def prior_update(self, frequency_sample):
         """Update the network prior to the observation."""
-        self.__prediction = 0.
+        self._prediction = 0.
         for mode in self.modes:
             mode.prior_update(frequency_sample)
-            self.__prediction += mode.prediction
+            self._prediction += mode.prediction
 
         logging.debug('KalmanFilterNetwork prediction: %f' % self.prediction)
 
     def posterior_update(self, observation):
         """Update the network posterior with the observation."""
-        self.__error = observation - self.prediction
+        self._error = observation - self.prediction
         logging.debug('KalmanFilterNetwork error: %f' % self.error)
         for mode in self.modes:
             mode.posterior_update(self.error)
@@ -180,52 +180,52 @@ class KalmanFilterMode(object):
     """
     def __init__(self, frequency, sin_coefficient, cos_coefficient, signal_error_covariance, signal_noise_covariance, observation_noise_covariance):
         """Initialize the Kalman filter mode."""
-        self.__frequency =frequency
-        self.__sin_coefficient = sin_coefficient
-        self.__cos_coefficient = cos_coefficient
-        self.__signal_noise_covariance = signal_noise_covariance
-        self.__observation_noise_covariance = observation_noise_covariance
-        self.__prediction = 0.0
-        self.__error_covariance = signal_error_covariance
-        self.__phase = 0.
-        self.__cos_phase = 0.
-        self.__sin_phase = 0.
-        self.__quadrature = 0.
-        self.__convergence = 0.
-        self.__prediction_memory = np.zeros(MEMORY_SIZE)
-        self.__next_memory_index = 0
+        self._frequency =frequency
+        self._sin_coefficient = sin_coefficient
+        self._cos_coefficient = cos_coefficient
+        self._signal_noise_covariance = signal_noise_covariance
+        self._observation_noise_covariance = observation_noise_covariance
+        self._prediction = 0.0
+        self._error_covariance = signal_error_covariance
+        self._phase = 0.
+        self._cos_phase = 0.
+        self._sin_phase = 0.
+        self._quadrature = 0.
+        self._convergence = 0.
+        self._prediction_memory = np.zeros(MEMORY_SIZE)
+        self._next_memory_index = 0
 
     @property
     def phase(self):
-        return self.__phase
+        return self._phase
 
     @property
     def frequency(self):
-        return self.__frequency
+        return self._frequency
 
     @property
     def sin_coefficient(self):
-        return self.__sin_coefficient
+        return self._sin_coefficient
 
     @property
     def cos_coefficient(self):
-        return self.__cos_coefficient
+        return self._cos_coefficient
 
     @property
     def signal_noise_covariance(self):
-        return self.__signal_noise_covariance
+        return self._signal_noise_covariance
 
     @property
     def observation_noise_covariance(self):
-        return self.__observation_noise_covariance
+        return self._observation_noise_covariance
 
     @property
     def prediction(self):
-        return self.__prediction
+        return self._prediction
 
     @property
     def error_covariance(self):
-        return self.__error_covariance
+        return self._error_covariance
 
     @property
     def gain(self):
@@ -233,22 +233,22 @@ class KalmanFilterMode(object):
 
     @property
     def convergence(self):
-        return self.__convergence
+        return self._convergence
 
     def prior_update(self, frequency_sample):
         """Update the mode prior to the observation."""
         # Add the corresponding signal noise covariance to the error covariance matrix
-        self.__error_covariance[0][0] += self.signal_noise_covariance[0][0]
-        self.__error_covariance[0][1] += self.signal_noise_covariance[0][1]
-        self.__error_covariance[1][0] += self.signal_noise_covariance[1][0]
-        self.__error_covariance[1][1] += self.signal_noise_covariance[1][1]
+        self._error_covariance[0][0] += self.signal_noise_covariance[0][0]
+        self._error_covariance[0][1] += self.signal_noise_covariance[0][1]
+        self._error_covariance[1][0] += self.signal_noise_covariance[1][0]
+        self._error_covariance[1][1] += self.signal_noise_covariance[1][1]
 
         # Calculate the prediction
-        self.__phase += 2*np.pi*self.frequency/frequency_sample
-        self.__phase = np.mod(self.__phase, 2*np.pi)
-        self.__cos_phase = np.cos(self.phase)
-        self.__sin_phase = np.sin(self.phase)
-        self.__prediction = self.__cos_phase * self.cos_coefficient + self.__sin_phase * self.sin_coefficient
+        self._phase += 2*np.pi*self.frequency/frequency_sample
+        self._phase = np.mod(self._phase, 2*np.pi)
+        self._cos_phase = np.cos(self.phase)
+        self._sin_phase = np.sin(self.phase)
+        self._prediction = self._cos_phase * self.cos_coefficient + self._sin_phase * self.sin_coefficient
 
         # Node convergence
         self.__mode_convergence()
@@ -257,19 +257,19 @@ class KalmanFilterMode(object):
         """Update the mode posterior with the observation."""
 
         # Calculate the Kalman gain
-        H = np.array([self.__cos_phase, self.__sin_phase]).reshape(1, 2)
-        S_HT = np.dot(self.__error_covariance, H.T)
+        H = np.array([self._cos_phase, self._sin_phase]).reshape(1, 2)
+        S_HT = np.dot(self._error_covariance, H.T)
         HS_HT_plus_R = np.dot(H, S_HT) + self.observation_noise_covariance
         self.__gain = S_HT / HS_HT_plus_R
 
         # Control the state
-        self.__cos_coefficient += self.__gain[0] * error
-        self.__sin_coefficient += self.__gain[1] * error
+        self._cos_coefficient += self.__gain[0] * error
+        self._sin_coefficient += self.__gain[1] * error
 
         # Update the error covariance matrix
         I_minus_KH = np.eye(2) - np.dot(self.__gain, H)
-        self.__error_covariance = (
-            np.dot(I_minus_KH, np.dot(self.__error_covariance, I_minus_KH.T)) +
+        self._error_covariance = (
+            np.dot(I_minus_KH, np.dot(self._error_covariance, I_minus_KH.T)) +
             np.outer(self.__gain, self.__gain) * self.observation_noise_covariance
         )
 
@@ -287,28 +287,28 @@ class KalmanFilterMode(object):
         """
 
         # Calculate the current quadrature state
-        angle = np.mod(np.arctan2(self.__cos_phase, self.__sin_phase) + np.pi, 2 * np.pi)
+        angle = np.mod(np.arctan2(self._cos_phase, self._sin_phase) + np.pi, 2 * np.pi)
         quadrature_new = (angle // (2 * np.pi / QUADRATURE_STATES)).astype(int)
 
         # If the quadrature state has changed
-        if (self.__quadrature != quadrature_new):
+        if (self._quadrature != quadrature_new):
             # Store the prediction in the memory and increment the index
-            self.__prediction_memory[self.__next_memory_index] = self.prediction
-            self.__next_memory_index = (self.__next_memory_index + 1) % MEMORY_SIZE
+            self._prediction_memory[self._next_memory_index] = self.prediction
+            self._next_memory_index = (self._next_memory_index + 1) % MEMORY_SIZE
 
             # Calculate the cross product of the prediction with itself and the prediction lagged by the number of quadrature states
             indices = np.arange(MEMORY_SIZE)
             lagged_indices = (indices + QUADRATURE_STATES) % MEMORY_SIZE
 
-            cross_product_self = np.dot(self.__prediction_memory[indices], self.__prediction_memory[indices])
-            cross_product_lag = np.dot(self.__prediction_memory[indices], self.__prediction_memory[lagged_indices])
+            cross_product_self = np.dot(self._prediction_memory[indices], self._prediction_memory[indices])
+            cross_product_lag = np.dot(self._prediction_memory[indices], self._prediction_memory[lagged_indices])
 
             # Calculate the convergence
             if cross_product_self != 0:
-                self.__convergence = cross_product_lag / cross_product_self
+                self._convergence = cross_product_lag / cross_product_self
 
         # Update the quadrature state
-        self.__quadrature = quadrature_new
+        self._quadrature = quadrature_new
 
 
 
