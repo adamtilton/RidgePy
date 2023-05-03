@@ -5,11 +5,11 @@ OBJ_DIR = build/objs/
 LIB_DIR = build/libs/
 
 # C compiler and flags
-CC = gcc
-CFLAGS = -c -g -Wall -fPIC -MMD -std=c99 -I $(INC_DIR) -march=armv8-a+crc -arch arm64
+CC = clang
+CFLAGS = -c -g -Wall -fPIC -MMD -std=c99 -I $(INC_DIR) -arch x86_64
 
 # Linker flags and library location
-LDFLAGS = -shared -lm -L $(LIB_DIR) -march=armv8-a+crc -arch arm64
+LDFLAGS = -shared -lm -L $(LIB_DIR) -arch x86_64
 LDFLAGS += -Wl,-rpath,$(CUDIR)$(LIB_DIR)
 
 # Target library file and object files

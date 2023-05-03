@@ -1,47 +1,31 @@
 
 import numpy as np
 from pathlib import Path
-from ctypes import c_float, c_int, POINTER, Structure
+from ctypes import c_float, c_int, POINTER, Structure, byref
 
 from ridgepy.libridgewrapper.utils import wrap_function
 from ridgepy.libridgewrapper.config import MAIN_CONFIG, LIBRARY
 from ridgepy.libridgewrapper.kalman_filter_mode import KalmanFilterMode
 
 MODE_COUNT = MAIN_CONFIG['MODE_COUNT']
-PREDICTIONS_COUNT = MAIN_CONFIG['PREDICTIONS_COUNT']
 
 class KalmanFilterNetwork(Structure):
     _fields_ = [
+        ("modes", (KalmanFilterMode * MODE_COUNT)),
+        ("phase", c_float),
         ("prediction", c_float),
         ("error", c_float),
-        ("model", (c_float * (2*MODE_COUNT))),
-        ("kf_modes", (KalmanFilterMode * MODE_COUNT))
     ]
 
     def __init__(
         self,
-        mode_numbers: list,
-        learning_rate: float,
-        coefficients: list,
-        signal_noise_covariance: list,
-        observation_noise_covariance: float,
+        modes: list
     ) -> None:
 
-        assert len(mode_numbers) == MODE_COUNT, "Supported number of modes is {MODE_COUNT}."
+        assert len(modes) == MODE_COUNT, "Supported number of modes is {MODE_COUNT}."
 
-        for mode_ndx, mode_number in enumerate(mode_numbers):
-            self.kf_modes[mode_ndx].mode_number                   = c_int(mode_number)
-            self.kf_modes[mode_ndx].learning_rate                 = c_float(learning_rate)
-            self.kf_modes[mode_ndx].coefficients[0]               = c_float(coefficients[mode_ndx,0])
-            self.kf_modes[mode_ndx].coefficients[1]               = c_float(coefficients[mode_ndx,1])
-            self.kf_modes[mode_ndx].signal_noise_covariance[0][0] = c_float(signal_noise_covariance[0][0])
-            self.kf_modes[mode_ndx].signal_noise_covariance[0][1] = c_float(signal_noise_covariance[0][1])
-            self.kf_modes[mode_ndx].signal_noise_covariance[1][0] = c_float(signal_noise_covariance[1][0])
-            self.kf_modes[mode_ndx].signal_noise_covariance[1][1] = c_float(signal_noise_covariance[1][1])
-            self.kf_modes[mode_ndx].observation_noise_covariance  = c_float(observation_noise_covariance)
-            self.kf_modes[mode_ndx].convergence                   = c_float(0)
-            self.kf_modes[mode_ndx].quadrature                    = c_int(0)
-            self.kf_modes[mode_ndx].next_memory_index             = c_int(0)
+        for mode_ndx, mode in enumerate(modes):
+            self.modes[mode_ndx] = mode
 
         self.c_kalman_filter_network_prior_update = wrap_function(
             LIBRARY,
@@ -49,7 +33,6 @@ class KalmanFilterNetwork(Structure):
             None,
             [
                 POINTER(KalmanFilterNetwork),
-                c_float,
                 c_float
             ]
         )
@@ -59,26 +42,62 @@ class KalmanFilterNetwork(Structure):
             "kalman_filter_network_posterior_update",
             None,
             [
-                POINTER(KalmanFilterNetwork)
+                POINTER(KalmanFilterNetwork),
+                c_float
             ]
         )
 
     def prior_update(
         self,
-        phase: float,
-        observation: float,
+        frequency_sample: float,
     ):
 
         self.c_kalman_filter_network_prior_update(
-            self,
-            c_float(phase),
-            c_float(observation)
+            byref(self),
+            c_float(frequency_sample)
         )
 
     def posterior_update(
-        self
+        self,
+        observation: float
     ):
 
         self.c_kalman_filter_network_posterior_update(
-            self
+            byref(self),
+            c_float(observation)
         )
+
+    @property
+    def sin_coefficients(self):
+        return np.array([mode.sin_coefficient for mode in self.modes])
+
+    @property
+    def cos_coefficients(self):
+        return np.array([mode.cos_coefficient for mode in self.modes])
+
+    @property
+    def magnitudes(self):
+        return np.sqrt(self.sin_coefficients**2 + self.cos_coefficients**2)
+
+    @property
+    def convergences(self):
+        return np.array([mode.convergence for mode in self.modes])
+
+    @property
+    def frequencies(self):
+        return np.array([mode.frequency for mode in self.modes])
+
+    def current_parameters(self):
+        """Return the current parameters of the network."""
+        return {
+            'prediction': self.prediction,
+            'error': self.error,
+            'sin_coefficients': self.sin_coefficients.squeeze(),
+            'cos_coefficients': self.cos_coefficients.squeeze(),
+            'convergences': self.convergences.squeeze(),
+            'magnitudes': self.magnitudes.squeeze(),
+            'frequencies': self.frequencies.squeeze(),
+        }
+
+    def __repr__(self):
+        return f'KalmanFilterNetwork with {len(self.modes)} modes'

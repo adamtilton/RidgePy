@@ -1,7 +1,6 @@
 import numpy as np
 import logging
 
-
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 QUADRATURE_STATES = 8
@@ -92,11 +91,7 @@ class KalmanFilterNetwork(object):
 
     def prior_update(self, frequency_sample):
         """Update the network prior to the observation."""
-        self._prediction = 0.
-        for mode in self.modes:
-            mode.prior_update(frequency_sample)
-            self._prediction += mode.prediction
-
+        self._prediction = np.sum(np.array([mode.prior_update(frequency_sample) for mode in self.modes]))
         logging.debug('KalmanFilterNetwork prediction: %f' % self.prediction)
 
     def posterior_update(self, observation):
@@ -180,7 +175,7 @@ class KalmanFilterMode(object):
     """
     def __init__(self, frequency, sin_coefficient, cos_coefficient, signal_error_covariance, signal_noise_covariance, observation_noise_covariance):
         """Initialize the Kalman filter mode."""
-        self._frequency =frequency
+        self._frequency = frequency
         self._sin_coefficient = sin_coefficient
         self._cos_coefficient = cos_coefficient
         self._signal_noise_covariance = signal_noise_covariance
@@ -238,10 +233,7 @@ class KalmanFilterMode(object):
     def prior_update(self, frequency_sample):
         """Update the mode prior to the observation."""
         # Add the corresponding signal noise covariance to the error covariance matrix
-        self._error_covariance[0][0] += self.signal_noise_covariance[0][0]
-        self._error_covariance[0][1] += self.signal_noise_covariance[0][1]
-        self._error_covariance[1][0] += self.signal_noise_covariance[1][0]
-        self._error_covariance[1][1] += self.signal_noise_covariance[1][1]
+        self._error_covariance += self.signal_noise_covariance
 
         # Calculate the prediction
         self._phase += 2*np.pi*self.frequency/frequency_sample
@@ -252,6 +244,8 @@ class KalmanFilterMode(object):
 
         # Node convergence
         self.__mode_convergence()
+
+        return self._prediction
 
     def posterior_update(self, error):
         """Update the mode posterior with the observation."""

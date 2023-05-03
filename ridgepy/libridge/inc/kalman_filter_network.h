@@ -31,10 +31,10 @@
 //----------------------------------------------------------------------------
 
 typedef struct {
+    kf_mode_state_t modes[MODE_COUNT];
+    float phase;
     float prediction;
     float error;
-    float model[2*MODE_COUNT];
-    kf_mode_state_t kf_modes[MODE_COUNT];
 } kf_network_state_t;
 
 //----------------------------------------------------------------------------
@@ -43,12 +43,12 @@ typedef struct {
 
 void kalman_filter_network_prior_update(
     kf_network_state_t * kf_network_state,
-    float phase,
-    float observation
+    float frequency_sample
 );
 
 void kalman_filter_network_posterior_update(
-    kf_network_state_t * kf_network_state
+    kf_network_state_t * kf_network_state,
+    float observation
 );
 
 #endif

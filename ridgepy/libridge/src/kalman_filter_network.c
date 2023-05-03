@@ -31,30 +31,37 @@
 
 void kalman_filter_network_prior_update(
     kf_network_state_t * kf_network_state,
-    float phase,
-    float observation
+    float frequency_sample
 ){
 
-    // Update each node's prior prediction, and the network's prior prediction
-    kf_network_state->prediction = 0.0f;
+    // Initialize the network's prior prediction to zero
+    float network_prediction = 0.0f;
 
+
+    // Update each node's prior prediction, and the network's prior prediction
     for (int mode_ndx=0; mode_ndx<MODE_COUNT; mode_ndx++){
-        kalman_filter_mode_prior_update(&kf_network_state->kf_modes[mode_ndx], phase);
-        kf_network_state->prediction += kf_network_state->kf_modes[mode_ndx].prediction;
+        kalman_filter_mode_prior_update(&kf_network_state->modes[mode_ndx], frequency_sample);
+        network_prediction += kf_network_state->modes[mode_ndx].prediction;
     }
 
-    // Calculate the prediction error
-    kf_network_state->error = observation - kf_network_state->prediction;
-
+    // Update the network's prior prediction
+    kf_network_state->prediction = network_prediction;
 }
 
 void kalman_filter_network_posterior_update(
-    kf_network_state_t * kf_network_state
+    kf_network_state_t * kf_network_state,
+    float observation
 ){
+    // Calculate the prediction error
+    float error = observation - kf_network_state->prediction;
+
     // Update the posterior node parameter estimates of each node.
     for (int mode_ndx=0; mode_ndx<MODE_COUNT; mode_ndx++){
-        kalman_filter_mode_posterior_update(&kf_network_state->kf_modes[mode_ndx], kf_network_state->error);
+        kalman_filter_mode_posterior_update(&kf_network_state->modes[mode_ndx], error);
     }
+
+    // Update the network's posterior prediction
+    kf_network_state->error = error;
 }
 
 //----------------------------------------------------------------------------

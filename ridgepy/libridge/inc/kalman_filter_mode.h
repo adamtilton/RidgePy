@@ -30,22 +30,22 @@
 //----------------------------------------------------------------------------
 
 typedef struct {
-    int mode_number;
-    float learning_rate;
-    float coefficients[2];
-    float power;
-    float cos_phase;
-    float sin_phase;
-    float convergence;
-    int quadrature;
-    int next_memory_index;
-    float prediction_memory[PREDICTIONS_COUNT];
-    float error_covariance[2][2];
-    float prediction;
+    float frequency;
+    float sin_coefficient;
+    float cos_coefficient;
     float signal_noise_covariance[2][2];
     float observation_noise_covariance;
-    float gain[2];
-    float phase_update;
+    float prediction;
+    float error_covariance[2][2];
+    float phase;
+    float cos_phase;
+    float sin_phase;
+    float cos_gain;
+    float sin_gain;
+    float quadrature;
+    float convergence;
+    float prediction_memory[MEMORY_SIZE];
+    int next_memory_index;
 } kf_mode_state_t;
 
 //----------------------------------------------------------------------------

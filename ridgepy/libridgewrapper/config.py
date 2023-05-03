@@ -27,7 +27,7 @@ assert LIBRARY_FILE.exists(), f"Could not find library file at {LIBRARY_FILE}"
 MAIN_CONFIG = extract_macros_from_header(CONFIG_FILE)
 LIBRARY     = cdll.LoadLibrary(LIBRARY_FILE)
 
-if _name__ == "__main__":
+if __name__ == "__main__":
     print("MAIN_CONFIG:")
     for key, value in MAIN_CONFIG.items():
         print(f"{key}: {value}")
